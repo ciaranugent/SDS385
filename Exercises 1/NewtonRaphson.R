@@ -9,17 +9,24 @@ wi <- function(z){1/(1+exp(-z))}
 beta <- matrix(rep(0,11),11,1)
 betas <- NULL
 
+jit <- 0.000000001
+
+ls <- NULL
+
 for (i in 1:10){
 	z <- X%*%beta
 	beta <- beta - solve(crossprod(X,diag(c(wi(z)*(1-wi(z))))%*%X),crossprod(X,wi(z)-y))
+	l <- -sum(y*log(jit+wi(z)))-sum((1-y)*log(jit + 1-wi(z)))
 	betas <- cbind(betas,beta)
+	ls <- c(ls,as.numeric(l))
 }
 
+plot(ls,xlab='Iteration',ylab='Negaitve Log-Likelihood',main='Newton Raphson Convergence')
 
 # Solve Weighted Least Squares form from part C, I have added in a jitter of 0.0000001 to prevent dividing by zero, so the answers are the same as above upto a certain number of decimal places
-for (i in 1:10){
-	z <- X%*%beta
-	beta <- solve(crossprod(X,crossprod(-diag(c(wi(z)*(1-wi(z)))),X)),crossprod(X,-diag(c(wi(z)*(1-wi(z)))))%*%(-1/(1-wi(z)+0.0000001)+(1/(wi(z)*(1-wi(z))+0.0000001))*y + z))
-	betas <- cbind(betas,beta)
-}
+# for (i in 1:10){
+	# z <- X%*%beta
+	# beta <- solve(crossprod(X,crossprod(-diag(c(wi(z)*(1-wi(z)))),X)),crossprod(X,-diag(c(wi(z)*(1-wi(z)))))%*%(-1/(1-wi(z)+0.0000001)+(1/(wi(z)*(1-wi(z))+0.0000001))*y + z))
+	# betas <- cbind(betas,beta)
+# }
 
